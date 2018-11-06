@@ -84,6 +84,7 @@ def main():
     # print(keys)
     new_key = [key.decode() for key in keys]
     # print(new_key)
+    # 按id排序
     new_key = sorted(new_key,key = lambda i:int(i.split(':')[2]))
     # print(new_key)
     for key in new_key:
