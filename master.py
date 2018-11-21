@@ -2,9 +2,12 @@ import os
 import requests
 from pyquery import PyQuery as pq
 import re
+import json
 
 import config
 from cache import RedisCache
+from model import Task
+
 
 def parse_link(div):
     '''
@@ -65,7 +68,7 @@ def init_finish_task(path):
     # print(fileList)
     for file in fileList:
         file_name = os.path.basename(file)
-        task_id = file_name[:4]
+        task_id = file_name[:5]
         # print(task_id)
         redis_cache.sadd('Task:finish', task_id)
     print('init_finish_task...end')
@@ -80,8 +83,31 @@ def init_task_url():
     for link in link_list:
         task_url = config.task_url_head+link
         # print(task_url)
-        task_id = task_url[-4:]
-        redis_cache.set('Task:id:{}:url'.format(task_id),task_url)
+        task_id = task_url[-5:]
+        # redis_cache.set('Task:id:{}:url'.format(task_id),task_url)
+        t = task_from_url(task_url)
+        print(t.__dict__)
+        redis_cache.set('Task:id:{}'.format(task_id), t.__dict__)
+        # print(t)        
+
+def task_from_url(task_url):
+    page = get_page(task_url)
+    e = pq(page)
+
+    task_id = task_url[-5:]
+    title = e('.controlBar').find('.epi-title').text().replace('/', '-')
+    file_url = e('.audioplayer').find('audio').attr('src')
+    ext = file_url[-4:]
+    file_name = task_id+'.'+title+ext
+
+    t = Task()
+    t.id = task_id
+    t.title = title
+    t.url = task_url
+    t.file_name = file_name
+    t.file_url =  file_url
+    t.is_download = False
+    return t
 
 def main():
     init_task_url()
