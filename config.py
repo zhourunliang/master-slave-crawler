@@ -6,4 +6,4 @@ proxies = {
     'http':'http://'+proxy,
     'https':'https://'+proxy,
 }
-down_folder = 'download\\2010' 
+down_folder = 'download\\2011' 

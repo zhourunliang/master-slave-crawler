@@ -86,11 +86,16 @@ def init_task_url():
         task_id = task_url[-5:]
         # redis_cache.set('Task:id:{}:url'.format(task_id),task_url)
         t = task_from_url(task_url)
-        print(t.__dict__)
+        # print('add task {}'.format(t.__dict__))
+        print('add task_id {}'.format(task_id))
         redis_cache.set('Task:id:{}'.format(task_id), t.__dict__)
-        # print(t)        
+        # print(t)
+    print('init_task_url...end')  
 
 def task_from_url(task_url):
+    '''
+    获取任务
+    '''
     page = get_page(task_url)
     e = pq(page)
 
@@ -99,6 +104,7 @@ def task_from_url(task_url):
     file_url = e('.audioplayer').find('audio').attr('src')
     ext = file_url[-4:]
     file_name = task_id+'.'+title+ext
+    # content = e('.epi-description').html()
 
     t = Task()
     t.id = task_id
@@ -106,7 +112,7 @@ def task_from_url(task_url):
     t.url = task_url
     t.file_name = file_name
     t.file_url =  file_url
-    t.is_download = False
+    # t.content =  content
     return t
 
 def main():

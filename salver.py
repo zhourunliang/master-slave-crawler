@@ -2,6 +2,7 @@ import os
 import requests
 from pyquery import PyQuery as pq
 import re
+import json
 
 import config
 from cache import RedisCache
@@ -21,27 +22,15 @@ def get_page(url):
     return page
 
 
-def begin_task(task_id, url):
+def begin_task(task_id, file_name, file_url):
     print('begin task {}'.format(task_id))
     redis_cache = RedisCache()
     # 添加到正在下载列表
     redis_cache.sadd('Task:begin', task_id)
-    # print(url)
-    page = get_page(url)
-    e = pq(page)
-    title = e('.controlBar').find('.epi-title').text()
-    # print(title)
-    # num = re.search( r'.*第(\d)集.*', title, re.M|re.I).group(1)
-    # print(num)
-    link = e('.audioplayer').find('audio').attr('src')
-    # print(link)
-    ext = link[-4:]
-    # print(ext)
-    file_name = task_id+'.'+title+ext
     print('download...{}'.format(file_name))
     folder = config.down_folder
     path = os.path.join(folder, file_name)
-    download(link, path)
+    download(file_url, path)
     print('end task {}'.format(task_id))
 
 
@@ -69,7 +58,7 @@ def download(link, path):
                     print('download success')
                     # 添加到已下载
                     file_name = os.path.basename(path)
-                    content_id = file_name[:4]
+                    content_id = file_name[:5]
                     redis_cache.srem('Task:begin', content_id)
                     redis_cache.sadd('Task:finish', content_id)
             # print(r.text)
@@ -80,7 +69,7 @@ def download(link, path):
 def main():
     redis_cache = RedisCache()
     #  检查任务列表是否在已下载列表中
-    keys = redis_cache.keys('Task:id:[0-9]*:url')
+    keys = redis_cache.keys('Task:id:[0-9]*')
     # print(keys)
     new_key = [key.decode() for key in keys]
     # print(new_key)
@@ -97,9 +86,10 @@ def main():
         elif is_begin==1:
             print('Task {} is begin'.format(task_id))
         else:
-            url = redis_cache.get(key).decode()
-            # print(url)
-            begin_task(task_id, url)
+            file_name = json.loads(redis_cache.get(key).decode('utf-8').replace("\'", "\""))['file_name']
+            file_url = json.loads(redis_cache.get(key).decode('utf-8').replace("\'", "\""))['file_url']
+            # print(file_url)
+            begin_task(task_id, file_name, file_url)
 
 if __name__ == '__main__':
     main()

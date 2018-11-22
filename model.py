@@ -19,4 +19,4 @@ class Task(Model):
         self.url = ''
         self.file_name = ''
         self.file_url = ''
-        self.is_download = False
+        # self.content = ''
