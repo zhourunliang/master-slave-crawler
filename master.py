@@ -100,7 +100,7 @@ def task_from_url(task_url):
     e = pq(page)
 
     task_id = task_url[-5:]
-    title = e('.controlBar').find('.epi-title').text().replace('/', '-')
+    title = e('.controlBar').find('.epi-title').text().replace('/', '-').replace(':','：')
     file_url = e('.audioplayer').find('audio').attr('src')
     ext = file_url[-4:]
     file_name = task_id+'.'+title+ext

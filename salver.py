@@ -77,6 +77,8 @@ def main():
     new_key = sorted(new_key,key = lambda i:int(i.split(':')[2]))
     # print(new_key)
     for key in new_key:
+
+        
         task_id = key.split(':')[2]
         # print(task_id)
         is_finish = redis_cache.sismember('Task:finish', task_id)
