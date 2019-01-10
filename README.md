@@ -12,6 +12,7 @@
 ```
 git clone https://github.com/zhourunliang/master-slave-crawler
 ```
++ 修改config.py
 + 运行主爬虫
 ```
 python master.py
