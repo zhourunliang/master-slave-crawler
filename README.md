@@ -21,3 +21,5 @@ python master.py
 ```
 python salver.py
 ```
+### 设计图
+![示例](https://github.com/zhourunliang/master-slave-crawler/blob/master/images/主从分布式爬虫.png)
